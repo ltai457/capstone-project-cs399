@@ -2,3 +2,13 @@
 .vscode
 bin/
 obj/
+client/node_modules/
+client/.env
+client/.env.*.local
+wwwroot/app/
+.sites-runtime/
+
+# Local database credentials
+.env
+.env.*
+!.env.example

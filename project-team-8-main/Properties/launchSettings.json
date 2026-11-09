@@ -73,12 +73,12 @@
       "dotnetRunMessages": false,
       "launchBrowser": true,
       "applicationUrl": "https://localhost:8080;http://localhost:8081",
-      "launchUrl": "https://localhost:8080/homePage.html",
+      "launchUrl": "https://localhost:8080/app/",
       "urls": ""
     },
     "WSL": {
       "commandName": "WSL2",
-      "launchUrl": "https://localhost:8080/homePage.html",
+      "launchUrl": "https://localhost:8080/app/",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_URLS": "https://localhost:8081;http://localhost:8081"

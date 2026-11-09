@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Project_Authentication.Model;
@@ -25,7 +25,7 @@ public class Like
     [Required]
     public string UserName { get; set; }
 
-    public DateTime DateLiked { get; set; } = DateTime.Now;
+    public DateTime DateLiked { get; set; } = DateTime.UtcNow;
 
     /*public Like(int projectId, int userId, string userName)
     {

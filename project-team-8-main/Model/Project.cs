@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -37,7 +37,7 @@ namespace Project_Authentication.Model
 
         public string? LanguageUsed { get; set; }
 
-        public DateTime DateCreated { get; set; } = DateTime.Now;
+        public DateTime DateCreated { get; set; } = DateTime.UtcNow;
 
         public ICollection<Comment>? Comments { get; set; }
 

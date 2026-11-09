@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Project_Authentication.Data;
 using Project_Authentication.Dtos;
@@ -21,6 +22,7 @@ namespace Project_Authentication.Controllers
             _dbContext = dBContext;
         }
         [HttpGet("AllUser")]
+        [Authorize(Roles = "Admin")]
 
         ////[Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<UserListDto>>> GetUser()

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Project_Authentication.Model
@@ -21,6 +21,6 @@ namespace Project_Authentication.Model
 
         public string? UserName { get; set; }
         public string? CommentText { get; set; }
-        public DateTime DateTimes { get; set; } = DateTime.Now;
+        public DateTime DateTimes { get; set; } = DateTime.UtcNow;
     }
 }

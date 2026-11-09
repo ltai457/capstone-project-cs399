@@ -1,4 +1,4 @@
-﻿using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens;
 using Project_Authentication.Model;
 using System.Security.Claims;
 using System.Text;
@@ -15,7 +15,7 @@ namespace Project_Authentication.JWT
         {
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWTKEY:Secret"]));
         }
-        /// here we want to read our secret key that we set 
+        /// here we want to read our secret key that we set
         public string GenerateToken(User user, string roleName )
         {
             var claims = new List<Claim>
@@ -27,12 +27,12 @@ namespace Project_Authentication.JWT
 
 
 
-            };/// for checking with our authentication controller 
+            };/// for checking with our authentication controller
             var credential = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);// use to generate digital signature
             var Tokendes = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddMinutes(60),/// expiry time of token 
+                Expires = DateTime.UtcNow.AddMinutes(60),/// expiry time of token
                 SigningCredentials = credential,
             };
             var TokenHandler = new JwtSecurityTokenHandler();/// provide two method 1. CreateToken and WriteToken(Return a string value)

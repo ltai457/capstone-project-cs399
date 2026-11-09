@@ -2,6 +2,7 @@
 {
     public class CommentOutDto
     {
+        public int CommentID { get; set; }
         public int ProjectID { get; set; }
 
         public string? CommentText { get; set; }

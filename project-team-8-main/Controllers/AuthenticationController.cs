@@ -1,4 +1,3 @@
-﻿using AutoMapper;
 using BCrypt.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -9,10 +8,8 @@ using Project_Authentication.Dto;
 using Project_Authentication.Dtos;
 using Project_Authentication.JWT;
 using Project_Authentication.Model;
-using System.Drawing.Text;
 using System.Security.Policy;
 using Google.Apis.Auth;
-using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace Project_Authentication.Controllers
 {
@@ -22,13 +19,11 @@ namespace Project_Authentication.Controllers
     {
         private readonly IAuthenticaionRepo _authenticationRepo;
         private readonly ITokenManager _tokenManager;
-        private readonly IMapper _mapper;
 
-        public AuthenticationController(IAuthenticaionRepo authenticationRepo, ITokenManager tokenManager, IMapper mapper)
+        public AuthenticationController(IAuthenticaionRepo authenticationRepo, ITokenManager tokenManager)
         {
             _authenticationRepo = authenticationRepo;
             _tokenManager = tokenManager;
-            _mapper = mapper;
         }
 
         [HttpPost("Register")]
@@ -40,7 +35,10 @@ namespace Project_Authentication.Controllers
             }
 
             // Check if the user already exists
-            var existingUser = _authenticationRepo.GetUserByUsername(registerDto.Email);
+            if (registerDto.RoleID != 2 && registerDto.RoleID != 3)
+                return BadRequest("Only Student and Visitor accounts can be registered.");
+
+            var existingUser = _authenticationRepo.GetUserByEmail(registerDto.Email);
             if (existingUser != null)
             {
                 return Conflict("User with this email already exists.");
@@ -63,7 +61,7 @@ namespace Project_Authentication.Controllers
             var result = _authenticationRepo.RegisterUser(user);
             if (result > 0)
             {
-                return Ok(user);
+                return Ok(new { user.UserID, user.UserName, user.Email, user.RoleID });
             }
             else
             {

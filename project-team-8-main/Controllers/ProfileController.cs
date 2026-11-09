@@ -124,6 +124,7 @@ namespace Project_Authentication.Controllers
         // PUT: api/Profile/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> PutProfile(int id, [FromBody] ProfileInDto profileDto)
         {
             // Get the currently authenticated user's ID from the token
@@ -140,7 +141,7 @@ namespace Project_Authentication.Controllers
             }
 
             // Retrieve the existing profile from the database
-            var existingProfile = await _context.Profiles.FindAsync(id);
+            var existingProfile = await _context.Profiles.FirstOrDefaultAsync(p => p.UserID == id);
             if (existingProfile == null)
             {
                 return NotFound();
@@ -177,11 +178,14 @@ namespace Project_Authentication.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "Admin,Student,Visitor")]
-        public ProfileOutDto AddProfile ([FromBody]ProfileInDto profileInDto)
+        public ActionResult<ProfileOutDto> AddProfile ([FromBody]ProfileInDto profileInDto)
         {
             // Retrieve the UserID from the JWT token
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId");
             int userId = int.Parse(userIdClaim.Value);
+
+            if (_context.Profiles.Any(p => p.UserID == userId))
+                return Conflict("A profile already exists for this account.");
 
             // Retrieve the user name from the user database
             var user = _context.Users.FirstOrDefault(u => u.UserID == userId);
@@ -195,6 +199,7 @@ namespace Project_Authentication.Controllers
 
         // DELETE: api/Profile/5
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteProfile(int id)
         {
             if (_context.Profiles == null)
@@ -207,6 +212,8 @@ namespace Project_Authentication.Controllers
                 return NotFound();
             }
 
+            if (!User.IsInRole("Admin") && User.FindFirst("UserId")?.Value != profile.UserID.ToString())
+                return Forbid();
             _context.Profiles.Remove(profile);
             await _context.SaveChangesAsync();
 

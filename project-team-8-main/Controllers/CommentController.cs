@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NuGet.Protocol.Core.Types;
 using Project_Authentication.Data;
 using Project_Authentication.Dto;
 using Project_Authentication.Dtos;
@@ -38,8 +37,7 @@ namespace Project_Authentication.Controllers
 
             Comment c = new() { ProjectID = commentInDto.ProjectID, CommentText = commentInDto.CommentText, UserID = userId };
             Comment addedComment = _commentRepo.WriteComment(c);
-            CommentOutDto commentOutDto = new() { ProjectID = addedComment.ProjectID, CommentText = addedComment.CommentText, UserID = addedComment.UserID, UserName = username, OriginalTimestamp = addedComment.DateTimes};
-            commentOutDto.OriginalTimestamp = DateTime.Now;
+            CommentOutDto commentOutDto = new() { CommentID = addedComment.CommentID, ProjectID = addedComment.ProjectID, CommentText = addedComment.CommentText, UserID = addedComment.UserID, UserName = username, OriginalTimestamp = addedComment.DateTimes};
             return commentOutDto;
         }
 
@@ -49,6 +47,7 @@ namespace Project_Authentication.Controllers
             IEnumerable<Comment> comments = _commentRepo.GetAllCommentsByID(id);
             IEnumerable<CommentOutDto> c = comments.Select(e => new CommentOutDto
             {
+                CommentID = e.CommentID,
                 ProjectID = e.ProjectID,
                 CommentText = e.CommentText,
                 UserName = e.UserName,

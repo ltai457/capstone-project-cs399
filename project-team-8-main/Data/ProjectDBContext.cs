@@ -22,13 +22,15 @@ namespace Project_Authentication.Data
         public DbSet<Profile> Profiles { get; set; }    
 
 
-        ////public DbSet<Award> Awards { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
 
-        
-        ////protected override void OnModelCreating(ModelBuilder modelBuilder)
-        ///{
-        /// modelBuilder.Entity<Award>()
-        //// .HasOne(p => p.Project).WithOne(a => a.Award).HasForeignKey<Project>(w => w.ProjectID);
-        ///}
+            // Registration and authorization rely on these stable IDs and names.
+            modelBuilder.Entity<Role>().HasData(
+                new Role { RoleID = 1, RoleName = "Admin" },
+                new Role { RoleID = 2, RoleName = "Student" },
+                new Role { RoleID = 3, RoleName = "Visitor" });
+        }
     }
 }

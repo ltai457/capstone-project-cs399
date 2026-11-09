@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Build.Evaluation;
 using Microsoft.EntityFrameworkCore;
-using NuGet.Protocol.Core.Types;
 using Project_Authentication.Data;
 using Project_Authentication.Dtos;
 using System.Threading.Tasks;
@@ -64,7 +62,7 @@ namespace Project_Authentication.Controllers
                   {
                       ProjectID = projectId,
                       UserID = userId,
-                      DateLiked = DateTime.Now,
+                      DateLiked = DateTime.UtcNow,
                       UserName = user.UserName
                   };
 
@@ -146,7 +144,7 @@ namespace Project_Authentication.Controllers
                  {
                      ProjectID = projectId,
                      UserID = userId,
-                     DateLiked = DateTime.Now
+                     DateLiked = DateTime.UtcNow
                  });
 
                  _dBContext.SaveChanges();

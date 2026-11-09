@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-using NuGet.Protocol.Core.Types;
 using Project_Authentication.Data;
 using Project_Authentication.Dto;
 using Project_Authentication.Dtos;
@@ -76,6 +74,9 @@ namespace Project_Authentication.Controllers
             {
                 return NotFound();
             }
+
+            if (!project.IsApproved && !User.IsInRole("Admin") && User.FindFirst("UserId")?.Value != project.OwnerID.ToString())
+                return NotFound();
 
             return project;
         }
@@ -153,6 +154,11 @@ namespace Project_Authentication.Controllers
                 return NotFound();
             }
 
+            if (!User.IsInRole("Admin") && User.FindFirst("UserId")?.Value != project.OwnerID.ToString())
+                return Forbid();
+
+            if (!User.IsInRole("Admin")) project.IsApproved = false;
+
             // Update the properties of the project entity with the values from projectDto
             ///project.TeamName = projectDto.TeamName;
             ////project.TeamNumber = projectDto.TeamNumber;
@@ -209,7 +215,7 @@ namespace Project_Authentication.Controllers
                 LinktoGit = projectDto.LinktoGit,
                 LinktoYoutube = projectDto.LinktoYoutube,
                 LanguageUsed = projectDto.LanguageUsed,
-                DateCreated = DateTime.Now
+                DateCreated = DateTime.UtcNow
             };
             _context.Projects.Add(project);
             await _context.SaveChangesAsync();
@@ -446,7 +452,7 @@ namespace Project_Authentication.Controllers
                  LinktoGit = projectDto.LinktoGit,
                  LinktoYoutube = projectDto.LinktoYoutube,
                  LanguageUsed = projectDto.LanguageUsed,
-                 DateCreated = DateTime.Now
+                 DateCreated = DateTime.UtcNow
              };
 
              if (file != null && file.Length > 0)
@@ -476,6 +482,10 @@ namespace Project_Authentication.Controllers
         [Authorize(Roles = "Admin,Student")]
         public async Task<IActionResult> AddNewProjectWithImage([FromForm] ProjectDto projectDto)
         {
+            if (projectDto.Img != null && (projectDto.Img.Length > 5 * 1024 * 1024 ||
+                projectDto.Img.ContentType != "image/png"))
+                return BadRequest("Choose a PNG poster smaller than 5 MB.");
+
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "UserId");
             int ownerId = int.Parse(userIdClaim.Value);
             if (_context.Projects == null)
@@ -494,7 +504,7 @@ namespace Project_Authentication.Controllers
                 LinktoGit = projectDto.LinktoGit,
                 LinktoYoutube = projectDto.LinktoYoutube,
                 LanguageUsed = projectDto.LanguageUsed,
-                DateCreated = DateTime.Now,
+                DateCreated = DateTime.UtcNow,
                 OwnerID = ownerId,
             };
 
@@ -511,6 +521,7 @@ namespace Project_Authentication.Controllers
                 // full path to file in temp location
                 var filePath = Directory.GetCurrentDirectory();
                 string imgDir = Path.Combine(filePath, "wwwroot/img/Projects");
+                Directory.CreateDirectory(imgDir);
 
                 // Getting FileName
                 var fileName = Path.Combine(imgDir, project.ProjectID.ToString() + ".png");
@@ -547,13 +558,8 @@ namespace Project_Authentication.Controllers
             }
 
             // Retrieve the projects for the specified user
-            var projects = _projectRepo.GetProjectByUserID(ownerId);
-
-            if (projects == null)
-            {
-                // User not found or no projects found for the user
-                return NotFound();
-            }
+            var projects = _context.Projects.AsNoTracking()
+                .Where(p => p.OwnerID == ownerId).OrderByDescending(p => p.DateCreated).ToList();
 
             return Ok(projects);
         }

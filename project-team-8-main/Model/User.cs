@@ -1,5 +1,3 @@
-﻿using Microsoft.Build.ObjectModelRemoting;
-using NuGet.Protocol.Plugins;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
